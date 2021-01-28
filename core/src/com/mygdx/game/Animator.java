@@ -14,7 +14,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class Animator implements ApplicationListener {
-	// Constant rows and columns of the sprite shee
+	// Constant rows and columns of the sprite sheet
 	private static final int FRAME_COLS = 9, FRAME_ROWS = 4;
 
 	OrthographicCamera camera;
@@ -30,7 +30,10 @@ public class Animator implements ApplicationListener {
 	Sprite sprite;
 	//posiciones del personaje
 	float posX = 100;
-	float posY = 100;
+	float posY = 150;
+	float width = 60;
+	float height = 60;
+	float factorScale = 0.2f;
 	boolean walking = false;
 	Texture backgroundImage;
 	float scaleFactor = 1; //not used yet
@@ -41,8 +44,7 @@ public class Animator implements ApplicationListener {
 
 	@Override
 	public void create() {
-		/*camera = new OrthographicCamera();
-		camera.setToOrtho(false, 800, 480);*/
+
 		maxX = 600;
 		maxY = 150;
 		minX = -10;
@@ -93,7 +95,7 @@ public class Animator implements ApplicationListener {
 			backWalk[index++] = tmp[2][i];
 		}
 
-		//left walk
+		//right walk
 		TextureRegion[] rightWalk = new TextureRegion[FRAME_COLS];
 		index = 0;
 		for (int i = 0; i < FRAME_COLS; i++) {
@@ -123,23 +125,23 @@ public class Animator implements ApplicationListener {
 	public void render() {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT); // Clear screen
 		stateTime += Gdx.graphics.getDeltaTime(); // Accumulate elapsed animation time
-		//camera.update();
-		//maxX = Gdx.graphics.getWidth()/2;
-		//move control
+
 		if(Gdx.input.isKeyPressed(Input.Keys.UP)){
 			walking = true;
 			if(posY < maxY){
 				sprite.translateY(1f);
 				posY++;
+				width = width - factorScale;
+				height = height - factorScale;
 			}
 			currentFrame = frontWalkAnimation.getKeyFrame(stateTime, true);
 		}else if(Gdx.input.isKeyPressed(Input.Keys.DOWN)){
 			walking = true;
 			if(posY > minY){
 				sprite.translateY(-1f);
-			/*scaleFactor = scaleFactor - 0.1f;
-			sprite.scale(scaleFactor);*/
 				posY--;
+				width = width + factorScale;
+				height = height + factorScale;
 			}
 			currentFrame = backWalkAnimation.getKeyFrame(stateTime, true);
 		}else if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)){
@@ -163,9 +165,9 @@ public class Animator implements ApplicationListener {
 		spriteBatch.begin();
 		spriteBatch.draw(backgroundImage, 0 , 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		if(walking){
-			spriteBatch.draw(currentFrame, posX, posY); // Draw current frame at (50, 50)
+			spriteBatch.draw(currentFrame, posX, posY, width, height);
 		}else{
-			sprite.draw(spriteBatch);
+			spriteBatch.draw(sprite, posX, posY, width, height);
 		}
 		spriteBatch.end();
 	}
