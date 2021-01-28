@@ -14,36 +14,33 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class Animator implements ApplicationListener {
-	// Constant rows and columns of the sprite sheet
-	//private static final int FRAME_COLS = 12, FRAME_ROWS = 4;
+	// Constant rows and columns of the sprite shee
 	private static final int FRAME_COLS = 9, FRAME_ROWS = 4;
 
-	// Objects used
 	OrthographicCamera camera;
-	Animation<TextureRegion> walkAnimation; // Must declare frame type (TextureRegion)
+	Animation<TextureRegion> walkAnimation;
 	Animation<TextureRegion> frontWalkAnimation;
 	Animation<TextureRegion> backWalkAnimation;
 	Animation<TextureRegion> rightWalkAnimation;
 	Animation<TextureRegion> leftWalkAnimation;
 	TextureRegion currentFrame;
-	TextureRegion lastFrame;
+	TextureRegion lastFrame; //not used yet
 	Texture walkSheet;
 	SpriteBatch spriteBatch;
 	Sprite sprite;
+	//posiciones del personaje
 	float posX = 100;
 	float posY = 100;
 	boolean walking = false;
 	Texture backgroundImage;
-	float scaleFactor = 1;
+	float scaleFactor = 1; //not used yet
+	//posiciones limites para mover el presonaje
 	float maxX, maxY, minX, minY;
-
-
 	// A variable for tracking elapsed time for the animation
 	float stateTime;
 
 	@Override
 	public void create() {
-
 		/*camera = new OrthographicCamera();
 		camera.setToOrtho(false, 800, 480);*/
 		maxX = 600;
@@ -71,11 +68,12 @@ public class Animator implements ApplicationListener {
 			}
 		}
 
+		//posicion inicial del personaje
 		sprite = new Sprite(walkFrames[18]);
 		sprite.setPosition(posX, posY);
+
 		//front walk
 		TextureRegion[] frontWalk = new TextureRegion[FRAME_COLS];
-
 		index = 0;
 		for (int i = 0; i < FRAME_COLS; i++) {
 			frontWalk[index++] = tmp[0][i];
@@ -83,7 +81,6 @@ public class Animator implements ApplicationListener {
 
 		//left walk
 		TextureRegion[] leftWalk = new TextureRegion[FRAME_COLS];
-
 		index = 0;
 		for (int i = 0; i < FRAME_COLS; i++) {
 			leftWalk[index++] = tmp[1][i];
@@ -91,7 +88,6 @@ public class Animator implements ApplicationListener {
 
 		//back walk
 		TextureRegion[] backWalk = new TextureRegion[FRAME_COLS];
-
 		index = 0;
 		for (int i = 0; i < FRAME_COLS; i++) {
 			backWalk[index++] = tmp[2][i];
@@ -99,7 +95,6 @@ public class Animator implements ApplicationListener {
 
 		//left walk
 		TextureRegion[] rightWalk = new TextureRegion[FRAME_COLS];
-
 		index = 0;
 		for (int i = 0; i < FRAME_COLS; i++) {
 			rightWalk[index++] = tmp[3][i];
