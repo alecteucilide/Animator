@@ -35,8 +35,12 @@ public class Animator implements ApplicationListener {
 	float height = 60;
 	float factorScale = 0.2f;
 	boolean walking = false;
+	boolean jumping = false;
+	boolean goingUp = false;
+	boolean goingDown = false;
+	float acc = 0f; //acceleracion
+	float accModulator = 0.25f;
 	Texture backgroundImage;
-	float scaleFactor = 1; //not used yet
 	//posiciones limites para mover el presonaje
 	float maxX, maxY, minX, minY;
 	// A variable for tracking elapsed time for the animation
@@ -48,7 +52,7 @@ public class Animator implements ApplicationListener {
 		maxX = 600;
 		maxY = 150;
 		minX = -10;
-		minY = 0;
+		minY = 10;
 		// Load the sprite sheet as a Texture
 		walkSheet = new Texture(Gdx.files.internal("man_walking2.png"));
 		backgroundImage = new Texture(Gdx.files.internal("background1.png"));
@@ -126,49 +130,60 @@ public class Animator implements ApplicationListener {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT); // Clear screen
 		stateTime += Gdx.graphics.getDeltaTime(); // Accumulate elapsed animation time
 
-		if(Gdx.input.isKeyPressed(Input.Keys.UP)){
-			walking = true;
-			if(posY < maxY){
-				sprite.translateY(1f);
-				posY++;
-				width = width - factorScale;
-				height = height - factorScale;
+		if(jumping == false){
+			if(Gdx.input.isKeyPressed(Input.Keys.UP)){
+				walking = true;
+				if(posY < maxY){
+					sprite.translateY(1f);
+					posY++;
+					width = width - factorScale;
+					height = height - factorScale;
+				}
+				currentFrame = frontWalkAnimation.getKeyFrame(stateTime, true);
+			}else if(Gdx.input.isKeyPressed(Input.Keys.DOWN)){
+				walking = true;
+				if(posY > minY){
+					sprite.translateY(-1f);
+					posY--;
+					width = width + factorScale;
+					height = height + factorScale;
+				}
+				currentFrame = backWalkAnimation.getKeyFrame(stateTime, true);
+			}else if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)){
+				walking = true;
+				if(posX < maxX){
+					sprite.translateX(1f);
+					posX++;
+				}
+				currentFrame = rightWalkAnimation.getKeyFrame(stateTime, true);
+			}else if(Gdx.input.isKeyPressed(Input.Keys.LEFT)){
+				walking = true;
+				if(posX > minX){
+					sprite.translateX(-1f);
+					posX--;
+				}
+				currentFrame = leftWalkAnimation.getKeyFrame(stateTime, true);
+			}else if(Gdx.input.isKeyPressed(Input.Keys.J)){
+				jumping = true;
+			}else{
+				walking = false;
 			}
-			currentFrame = frontWalkAnimation.getKeyFrame(stateTime, true);
-		}else if(Gdx.input.isKeyPressed(Input.Keys.DOWN)){
-			walking = true;
-			if(posY > minY){
-				sprite.translateY(-1f);
-				posY--;
-				width = width + factorScale;
-				height = height + factorScale;
-			}
-			currentFrame = backWalkAnimation.getKeyFrame(stateTime, true);
-		}else if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)){
-			walking = true;
-			if(posX < maxX){
-				sprite.translateX(1f);
-				posX++;
-			}
-			currentFrame = rightWalkAnimation.getKeyFrame(stateTime, true);
-		}else if(Gdx.input.isKeyPressed(Input.Keys.LEFT)){
-			walking = true;
-			if(posX > minX){
-				sprite.translateX(-1f);
-				posX--;
-			}
-			currentFrame = leftWalkAnimation.getKeyFrame(stateTime, true);
-		}else{
-			walking = false;
+		}else {
+			jumpingCycle();
 		}
 
 		spriteBatch.begin();
 		spriteBatch.draw(backgroundImage, 0 , 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		if(walking){
-			spriteBatch.draw(currentFrame, posX, posY, width, height);
-		}else{
+		if(jumping == false){
+			if(walking){
+				spriteBatch.draw(currentFrame, posX, posY, width, height);
+			}else{
+				spriteBatch.draw(sprite, posX, posY, width, height);
+			}
+		}else {
 			spriteBatch.draw(sprite, posX, posY, width, height);
 		}
+
 		spriteBatch.end();
 	}
 
@@ -186,5 +201,29 @@ public class Animator implements ApplicationListener {
 	public void dispose() { // SpriteBatches and Textures must always be disposed
 		spriteBatch.dispose();
 		walkSheet.dispose();
+	}
+
+	public void jumpingCycle(){
+
+		if(accModulator <= 8 && goingUp == false && goingDown == false){
+			goingUp = true;
+		}else if(accModulator >= 8 && goingUp){
+			goingUp = false;
+			goingDown = true;
+		}else if(accModulator < 0.5f && goingDown){
+			goingDown = false;
+			accModulator = 0.5f;
+			jumping = false;
+		}
+
+		if(goingUp){
+			acc = 1 / accModulator;
+			accModulator = accModulator + 1f;
+			posY = posY + (10*acc);
+		}else if(goingDown){
+			acc = 1 / accModulator;
+			accModulator = accModulator - 1f;
+			posY = posY - (10*acc);
+		}
 	}
 }
