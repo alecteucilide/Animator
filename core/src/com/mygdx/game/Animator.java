@@ -30,7 +30,7 @@ public class Animator implements ApplicationListener {
 	Sprite sprite;
 	//posiciones del personaje
 	float posX = 100;
-	float posY = 150;
+	float posY = 100;
 	float width = 60;
 	float height = 60;
 	float factorScale = 0.2f;
@@ -163,7 +163,7 @@ public class Animator implements ApplicationListener {
 					posX--;
 				}
 				currentFrame = leftWalkAnimation.getKeyFrame(stateTime, true);
-			}else if(Gdx.input.isKeyPressed(Input.Keys.J)){
+			}else if(Gdx.input.isTouched()){
 				jumping = true;
 			}else{
 				walking = false;
